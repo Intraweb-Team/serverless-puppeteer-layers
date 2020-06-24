@@ -4,21 +4,46 @@ const puppeteer = chromium.puppeteer;
 
 module.exports.index = async (event, context) => {
   let browser = null;
+  const request = getRequestPayload(event);
+
+  const viewport = {
+    width: request.width || 1920,
+    height: request.height || 1080,
+    deviceScaleFactor: request.scale || 2
+  };
+
+  if (!request.address && !request.html) {
+    return {
+      statusCode: 400,
+      body: JSON.stringify({message: 'Address or HTML must be specified'})
+    }
+  }
+
   try {
     browser = await puppeteer.launch({
-      defaultViewport:{width:1024,height:800},
+      defaultViewport: viewport,
       headless: true,
       executablePath: await chromium.executablePath,
       args: chromium.args,
     });
 
-    const page = await browser.newPage();
-    await page.goto(event['queryStringParameters'].address, {
-      waitUntil: ['domcontentloaded', 'networkidle0'],
-    });
+    let page = await browser.newPage();
+
+    if (request.address) {
+      await page.goto(request.address, {
+        waitUntil: ['domcontentloaded', 'networkidle0'],
+      });
+    } else {
+      await page.setContent(request.html, {
+        waitUntil: ['domcontentloaded', 'networkidle0'],
+      })
+    }
+
+    if (request.selector) {
+      page = await page.$(request.selector)
+    }
 
     const image = await page.screenshot({
-      clip: { x: 0, y: 0, width: 1024, height: 800 },
       encoding: 'base64'
     });
 
@@ -41,3 +66,13 @@ module.exports.index = async (event, context) => {
       await browser.close();
   }
 };
+
+function getRequestPayload(event) {
+  try {
+    let payload = Buffer.from(event.body || '', 'base64').toString();
+    return payload ? JSON.parse(payload): {};
+  } catch (e) {
+    console.warn(e)
+    return {}
+  }
+}

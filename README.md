@@ -1,3 +1,14 @@
+# API Parameters
+
+| Name     | Type           | Required | Default |  Description |
+| -------- | -------------- | -------- | ------- | ------------ |
+| address  | string         | yes *    |         | Valid URL address. Required if `html` is not specified |
+| html     | string         | yes *    |         | Valid HTML string. Required if `address` is not specified |
+| selector | string         | no       |         | HTML selector which should be rasterized. Example: `#content` |
+| width    | string, number | no       | 1920    | Viewport width |
+| height   | string, number | no       | 1080    | Viewport height |
+| scale    | string, number | no       | 2       | Viewport device scale rate |
+
 # Serverless Puppeteer using AWS Lambda Layers
 
 <p>

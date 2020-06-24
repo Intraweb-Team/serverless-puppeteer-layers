@@ -23,10 +23,10 @@ functions:
   puppeteer-orchestrator:
     handler: handler.index
     timeout: 30
-    memorySize: 2048
+    memorySize: 1024
     events:
       - http:
-          method: GET
+          method: POST
           path: /screenshot
           contentHandling: CONVERT_TO_BINARY
     layers:
@@ -35,4 +35,4 @@ functions:
 layers:
   chrome:
     package:
-      artifact: layer/chrome.zip    
+      artifact: layer/chrome.zip
