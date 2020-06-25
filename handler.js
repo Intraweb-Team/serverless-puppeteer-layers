@@ -41,6 +41,16 @@ module.exports.index = async (event, context) => {
 
     if (request.selector) {
       page = await page.$(request.selector)
+
+      if (!page) {
+        return {
+          statusCode: 400,
+          body: JSON.stringify({
+            message: `Selector ${request.selector} not found on the received page`
+
+          })
+        }
+      }
     }
 
     const image = await page.screenshot({
